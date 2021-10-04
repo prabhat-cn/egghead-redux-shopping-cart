@@ -4,7 +4,7 @@ Example shopping cart application for learning redux and redux toolkit. Goes alo
 
 ## Setup
 
-Checkout the code base and then type:
+Checkout the code base and then type: 14
 
 ```
 npm install

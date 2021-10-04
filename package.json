@@ -1,5 +1,7 @@
 {
   "description": "Sample Shopping Cart to Explore using RTK",
+  "link": "https://redux-typescript-shop.netlify.app/",
+  "git": "https://github.com/prabhat-cn/redux-shopping-cart",
   "version": "0.2.0",
   "scripts": {
     "dev": "vite",
