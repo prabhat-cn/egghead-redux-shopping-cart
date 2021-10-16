@@ -1,7 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { getTotalPrice, removeFromCart, updateQuantity } from './cartSlice';
+import {
+  getTotalPrice,
+  removeFromCart,
+  updateQuantity,
+  checkoutCart,
+} from './cartSlice';
 import styles from './Cart.module.css';
 
 export function Cart() {
@@ -9,7 +14,8 @@ export function Cart() {
   const products = useAppSelector((state) => state.products.products);
   const items = useAppSelector((state) => state.cart.items);
   const totalPrice = useAppSelector(getTotalPrice);
-  const chackoutState = useAppSelector((state) => state.cart.checkoutState);
+  const checkoutState = useAppSelector((state) => state.cart.checkoutState);
+  const errorMessage = useAppSelector((state) => state.cart.errorMessage);
 
   const onQuantityChange = (
     event: React.FocusEvent<HTMLInputElement>,
@@ -18,10 +24,18 @@ export function Cart() {
     const quantity = Number(event.target.value) || 0;
     dispatch(updateQuantity({ id, quantity }));
   };
+
+  const onCheckout = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // dispatch({ type: 'cart/checkout/pending' });
+    // dispatch(checkoutCart(items));
+    dispatch(checkoutCart());
+    // dispatch(checkoutCart());
+  };
   const tableClasses = classNames({
     [styles.table]: true, //css here
-    [styles.checkoutError]: chackoutState === 'ERROR',
-    [styles.checkoutLoading]: chackoutState === 'LOADING',
+    [styles.checkoutError]: checkoutState === 'ERROR',
+    [styles.checkoutLoading]: checkoutState === 'LOADING',
   });
   return (
     <main className="page">
@@ -89,7 +103,10 @@ export function Cart() {
         </>
       )}
 
-      <form>
+      <form onSubmit={onCheckout}>
+        {checkoutState === 'ERROR' && errorMessage ? (
+          <p className={styles.errorBox}>{errorMessage}</p>
+        ) : null}
         <button className={styles.button} type="submit">
           Checkout
         </button>
