@@ -1,64 +1,75 @@
-import {createSlice, createSelector, PayloadAction} from '@reduxjs/toolkit'
-import {RootState} from '../../app/store'
+import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../../app/store';
+
+export type CheckoutState = 'LOADING' | 'READY' | 'ERROR';
 
 export interface CartState {
-    // {[productID: type]: value}
-    items: {[productID: string]: number}
+  // {[productID: type]: value}
+  items: { [productID: string]: number };
+  checkoutState: CheckoutState;
 }
 
 const initialState: CartState = {
-    items: {}
-}
+  items: {},
+  checkoutState: 'READY',
+};
 
 const cartSlice = createSlice({
-    // key
-    name: "cart",
-    initialState,
-    reducers: {
+  // key
+  name: 'cart',
+  initialState,
+  reducers: {
     // Actions here
-    addToCart(state, action: PayloadAction<string>){
-        const id = action.payload;
-        // state.items[id] = 1;
-        //  more than 1
-        if(state.items[id]) {
-            state.items[id]++;
-        }else {
-            state.items[id] = 1;
-        }
+    addToCart(state, action: PayloadAction<string>) {
+      const id = action.payload;
+      // state.items[id] = 1;
+      //  more than 1
+      if (state.items[id]) {
+        state.items[id]++;
+      } else {
+        state.items[id] = 1;
+      }
     },
-    removeFromCart(state, action: PayloadAction<string>){
-        delete state.items[action.payload];
-    }
-    }
+    removeFromCart(state, action: PayloadAction<string>) {
+      delete state.items[action.payload];
+    },
+    updateQuantity(
+      state,
+      action: PayloadAction<{ id: string; quantity: number }>
+    ) {
+      const { id, quantity } = action.payload;
+      state.items[id] = quantity;
+    },
+  },
 });
 
-export const {addToCart, removeFromCart} = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity } = cartSlice.actions;
 export default cartSlice.reducer;
 
 // extra Operations
 export function getNumItems(state: RootState) {
-    console.log('Calling NumItems');
-    
-    let numItems = 0;
-    for(let id in state.cart.items){
-        numItems += state.cart.items[id];
-    }
-    return numItems;
+  console.log('Calling NumItems');
+
+  let numItems = 0;
+  for (let id in state.cart.items) {
+    numItems += state.cart.items[id];
+  }
+  return numItems;
 }
 
 // Memorize cart items
 export const getMemorizedNumItems = createSelector(
-    // two functions
-    (state: RootState) => state.cart.items,
-    (items) => {
-        console.log('Calling Memorized NumItems');
-        let numItems = 0;
-        for(let id in items){
-            numItems += items[id];
-        }
-        return numItems;
+  // two functions
+  (state: RootState) => state.cart.items,
+  (items) => {
+    console.log('Calling Memorized NumItems');
+    let numItems = 0;
+    for (let id in items) {
+      numItems += items[id];
     }
-)
+    return numItems;
+  }
+);
 
 // export const getTotalPrice = createSelector<RootState, any, any, string>(
 //     // 3 Fun
@@ -75,15 +86,14 @@ export const getMemorizedNumItems = createSelector(
 // )
 
 export const getTotalPrice = createSelector(
-    // 3 Fun
-    (state: RootState) => state.cart.items,
-    (state: RootState) => state.products.products,
-    (items, products) => {
-        let total = 0;
-        for(let id in items){
-            total += products[id].price * items[id];
-        }
-        return total.toFixed(2);
+  // 3 Fun
+  (state: RootState) => state.cart.items,
+  (state: RootState) => state.products.products,
+  (items, products) => {
+    let total = 0;
+    for (let id in items) {
+      total += products[id].price * items[id];
     }
-
-)
+    return total.toFixed(2);
+  }
+);
